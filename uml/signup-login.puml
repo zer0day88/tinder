@@ -1,0 +1,41 @@
+@startuml
+
+title "signup & login process"
+participant user as u
+participant service as s
+database db
+participant "email service" as es
+autonumber
+
+u -> s : POST /v1/signup
+s -> db : validate email if registered
+alt email already registered
+    db --> s : email found
+    s --> u : return email already registered
+else email not registered
+    db --> s : email not found
+    s -> s: validate input & hash password
+    s --> u : return success
+    s -> es : send email to confirm
+    es --> u : send email confirmation
+    u->s : click POST /v1/confirm-email/<token>
+    s->db: check token
+    db --> s: valid
+    s->u : success confirm email
+
+end alt
+
+u -> s : POST /v1/login
+s -> db : get email & password
+db--> s: return data
+s->s : validate email & password
+alt success
+s -> u : return access token & refresh token
+else failed
+s-> u : return 401
+end alt
+
+
+
+
+@enduml

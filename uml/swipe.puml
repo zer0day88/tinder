@@ -1,0 +1,26 @@
+@startuml
+
+title "swipe process"
+participant user as u
+participant service as s
+database db
+autonumber
+
+u -> s : POST /v1/swipe?direction=pass/like
+
+
+s -> db : check if quota exceed for a day 10 swipe for free user
+alt quota exceed
+ s--> u: return quota exceed
+else quota not exceed
+s -> db : save swipe count per day by profile_id
+s -> u : return success
+end alt
+
+
+
+
+
+
+
+@enduml
